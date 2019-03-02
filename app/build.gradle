@@ -1,0 +1,100 @@
+apply plugin: 'com.android.application'
+
+android {
+    compileSdkVersion 27
+    defaultConfig {
+        applicationId "com.chessluo.channelpackagedemo"
+        minSdkVersion 14
+        targetSdkVersion 27
+        versionCode 1
+        versionName "1.0"
+        testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
+        //
+        flavorDimensions "versionCode"
+    }
+    signingConfigs {
+        appkey {
+            //ChessluoStudy.jks文件放在项目根目录下
+            storeFile file('../ChessluoStudy.jks')
+            storePassword "123456"
+            keyAlias "ChessluoStudy"
+            keyPassword "123456"
+        }
+    }
+
+    buildTypes {
+        debug {
+            minifyEnabled false
+            signingConfig signingConfigs.appkey
+        }
+
+        release {
+            minifyEnabled false
+            signingConfig signingConfigs.appkey
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+        }
+    }
+
+/** 在build.gradle设置productFlavors */
+    productFlavors {
+        xiaomi {
+            buildConfigField "int", "CHANNEL_TYPE", "1"
+            manifestPlaceholders = [
+                    CHANNEL_VALUE: "小米"
+            ]
+        }
+        qh360 {
+            buildConfigField "int", "CHANNEL_TYPE", "2"
+            manifestPlaceholders = [
+                    CHANNEL_VALUE: "360"
+            ]
+        }
+        baidu {
+            buildConfigField "int", "CHANNEL_TYPE", "3"
+            manifestPlaceholders = [
+                    CHANNEL_VALUE: "百度"
+            ]
+        }
+        wandoujia {
+            buildConfigField "int", "CHANNEL_TYPE", "4"
+            manifestPlaceholders = [
+                    CHANNEL_VALUE: "豌豆荚"
+            ]
+        }
+        qq {
+            buildConfigField "int", "CHANNEL_TYPE", "5"
+            manifestPlaceholders = [
+                    CHANNEL_VALUE: "应用宝"
+            ]
+        }
+        huawei {
+            buildConfigField "int", "CHANNEL_TYPE", "6"
+            manifestPlaceholders = [
+                    CHANNEL_VALUE: "华为"
+            ]
+        }
+    }
+    /** 修改打包后的apk名称 */
+    applicationVariants.all { variant ->
+        variant.outputs.all { output ->
+            def buildName = ''
+            variant.productFlavors.each { product ->
+                buildName = product.name
+            }
+            //chessluo_v版本名_渠道名.apk
+            def releaseApkName = 'chessluo' + '_' + buildName + '_v' + defaultConfig.versionName + "_" + variant.buildType.name + '.apk'
+            // 指定Apk输出路径
+            if (project.hasProperty('OUT_PUT_DIR')) {
+                outputFileName = releaseApkName
+            } else {
+                outputFileName = releaseApkName
+            }
+        }
+    }
+
+}
+
+dependencies {
+    implementation fileTree(include: ['*.jar'], dir: 'libs')
+    implementation 'com.android.support:appcompat-v7:27.1.1'
+}
